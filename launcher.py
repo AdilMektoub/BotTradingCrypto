@@ -89,4 +89,67 @@ def nagios(main):
 
     return x, tail
 
+def alive(main):
+    x, tail = nagios(main)
 
+    if x == 0:
+        print("OK - No recent problems")
+    elif x == 1:
+        print("WARNING - Some none fatal error has occured")
+    elif x == 2:
+        print("CRITICAL - Something made the program stop in a non-standard way")
+    elif x == 3:
+        print("UNKNOWN - The program seems to have ended gracefully")
+
+    if tail:
+        print(tail)
+    else:
+        print("Cannot gather the end of the log")
+
+    sys.exit(x)
+
+def start(main):
+
+    if os.path.isfile(PIDFILE):
+
+        pid = get_pid()
+
+        if pid != None and is_running(pid):
+            print("The process is already running.")
+            return
+        else:
+            print("It seems that the last instance did not ended gracefully.")
+
+    print("Starting the process...", end='')
+
+    try:
+        sub = subprocess.Popen(os.path.join(os.getcwd(), main))
+    except PermissionError:
+        print("\nPlease make sure you have execution rights on: {}".format(main))
+        return
+    except OSError as err:
+        if err.errno == errno.ENOEXEC:
+            print("\nPlease make sure the file {} have a shebang".format(main))
+            return
+        else:
+            raise err
+
+    i   = 0
+    while i < 15:
+        if is_running(sub.pid):
+            break
+        else:
+            time.sleep(1)
+            print('.', end='')
+
+        i += 1
+
+    print('')
+
+    if i == 15:
+        print("The process seems to have crashed at start.")
+        return
+
+    print("Started at pid: {}".format(sub.pid))
+
+    write_pid(sub.pid)
