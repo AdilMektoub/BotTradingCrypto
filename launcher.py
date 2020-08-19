@@ -153,3 +153,70 @@ def start(main):
     print("Started at pid: {}".format(sub.pid))
 
     write_pid(sub.pid)
+
+def stop():
+
+    if not os.path.isfile(PIDFILE):
+        print("There is no pidfile of name '{}', cannot stop anything".format(PIDFILE))
+        return
+
+    pid = get_pid()
+
+    if pid == None:
+        print("Unable to stop the process.")
+        return
+
+    if not is_running(pid):
+        print("The process is not running.")
+        return
+
+    print("Stopping the process of pid {}...".format(pid), end='')
+
+    os.kill(pid, signal.SIGTERM)
+    i = 0
+    while i < 15:
+        if not is_running(pid):
+            break
+        else:
+            time.sleep(1)
+            print('.', end='')
+
+        i += 1
+
+    print('')
+
+    if i == 15:
+        print("The process do not seems to stop, trying the not-so-graceful-method.")
+        os.kill(pid, signal.SIGKILL)
+
+    print("Ended.")
+    os.remove(PIDFILE)
+
+if __name__ == "__main__":
+
+    if len(sys.argv) < 3:
+        print(help)
+        sys.exit("Lack of arguments.")
+
+    PIDFILE = PIDFILE.format(sys.argv[1])
+    main    = sys.argv[1]
+
+    if not os.path.isfile(main):
+        sys.exit("The main module do not exist, please check the spelling.")
+
+    if sys.argv[2] == "start":
+        start(main)
+
+    elif sys.argv[2] == "stop":
+        stop()
+
+    elif sys.argv[2] == "restart":
+        stop()
+        start(main)
+
+    elif sys.argv[2] == "alive":
+        alive(main)
+
+    else:
+        print(help)
+        sys.exit(os.EX_USAGE)
