@@ -3,7 +3,7 @@ __author__ = 'Adil'
 
 import asyncio
 import pickle
-import datetime,time,json,sys
+import datetime,time,json,...,sys
 import rotate_log
 import wallet
 
@@ -93,7 +93,7 @@ class MarketPlace:
         )
 
         if self.api == None:
-            raise Exception("Cannot connect to ccxt")
+            raise Exception("Cannot connect to ...")
 
     def add_wallet(self, wallet_infos, test):
         symbol = wallet_infos['symbol']
