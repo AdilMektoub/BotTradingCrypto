@@ -3,7 +3,7 @@ __author__ = 'Adil'
 
 import asyncio
 import pickle
-import datetime,time,json,ccxt,sys
+import datetime,time,json,sys
 import rotate_log
 import wallet
 
