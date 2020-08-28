@@ -127,7 +127,7 @@ class MarketPlace:
         for wallet in self.wallets.values():
             wallet.write_wallet()
 
-    def ccxt_main(self, func, *args):
+    def ..._main(self, func, *args):
         """
             The base function of this linear api
             All calls to the api walk through this try/catch anyway.
@@ -138,8 +138,8 @@ class MarketPlace:
             try:
                 method = getattr(self.api, func)
                 return method(*args)
-            except ccxt.NetworkError as e:
-                logger.error("CCXT Network Error: {}".format(repr(e)))
+            except ....NetworkError as e:
+                logger.error("... Network Error: {}".format(repr(e)))
                 logger.info("Essai 1/2: Failed")
                 try:
                     res = method(*args)
@@ -169,10 +169,10 @@ class MarketPlace:
         return (base, quote)
 
     async def check_finished(self, task, symbol):
-        order = self.ccxt_main('fetchOrder', task.Id, symbol)
+        order = self. ..._main('fetchOrder', task.Id, symbol)
         while order['status'] == 'open':
             await asyncio.sleep(10)
-            order = self.ccxt_main('fetchOrder', task.Id, symbol)
+            order = self. ..._main('fetchOrder', task.Id, symbol)
 
         lot     = task.end(order)
         minimal = self.get_minimal_quantity(symbol)
@@ -184,7 +184,7 @@ class MarketPlace:
     def stop_not_finished(self, symbol):
         wallet = self.wallets[symbol]
         for task in wallet.tasks.values():
-            order = self.ccxt_main('fetchOrder', task.Id, symbol)
+            order = self. ..._main('fetchOrder', task.Id, symbol)
             if order['status'] == 'open':
                 order = self.cancelOrder(task.Id, symbol)
 
@@ -192,12 +192,12 @@ class MarketPlace:
 
     def is_order_completed(self, Id, symbol):
         """ Check of an order is completed or if he is open """
-        order = self.ccxt_main('fetchOrder', Id, symbol)
+        order = self. ..._main('fetchOrder', Id, symbol)
         return order['status'] != 'open'
 
     def get_limitsForMarkets(self, symbol):
         """return all the limits if a market like the minimal quantity of a transaction"""
-        markets = self.ccxt_main('fetchMarkets')
+        markets = self. ..._main('fetchMarkets')
 
         if markets:
             for market in markets:
@@ -219,7 +219,7 @@ class MarketPlace:
 
     def checksymbol(self, symbol):
         """check if we allowed this marketplace to trade and if the api knows it"""
-        markets = self.ccxt_main('fetchMarkets')
+        markets = self. ..._main('fetchMarkets')
 
         if markets == None:
             logger.error("Cannot know if the symbol {} is supported".format(symbol))
@@ -244,7 +244,7 @@ class MarketPlace:
         return False
 
     def get_symbol_list(self):
-        markets = self.ccxt_main('fetchMarkets')
+        markets = self. ..._main('fetchMarkets')
 
         if markets == None:
             logger.error("Cannot get the symbol list")
@@ -266,16 +266,16 @@ class MarketPlace:
         if self.futures:
             params['options'] = {'defaultMarket': 'futures'}
 
-        method   = getattr(ccxt, self.exchange)  # conversion string en method
+        method   = getattr(..., self.exchange)  # conversion string en method
         self.api = method(params)
 
-        if not self.ccxt_main('loadMarkets'):
+        if not self. ..._main('loadMarkets'):
             logger.critical("Unable to load markets of the first time, abort")
             raise Exception("Unable to load markets of the first time, abort")
 
     def get_prix(self, symbol):
 
-        tick = self.ccxt_main('fetchTicker', symbol)
+        tick = self. ..._main('fetchTicker', symbol)
         if isinstance(tick, dict):
             self.last   = tick['last']
             self.bid    = tick['bid']
@@ -287,7 +287,7 @@ class MarketPlace:
 
     def get_symbol_balance(self, symbol):
         # import pdb; pdb.set_trace()
-        balance = self.ccxt_main('fetchBalance')
+        balance = self. ..._main('fetchBalance')
         if balance and isinstance(balance, str) :
             try:
                 balance = json.loads(balance)
@@ -321,9 +321,9 @@ class MarketPlace:
 
 
     def fetchTicker(self, symbol):
-        ticker = self.ccxt_main('fetchTicker', symbol)
+        ticker = self. ..._main('fetchTicker', symbol)
         if not ticker:
-            tickers = self.ccxt_main('fetchTickers')
+            tickers = self. ..._main('fetchTickers')
             if symbol in tickers:
                 ticker = tickers[symbol]
             else:
@@ -347,7 +347,7 @@ class MarketPlace:
 
         try:
             result = self.api.createLimitSellOrder(symbol, quantity, price)
-        except ccxt.InsufficientFunds as e:
+        except  ....InsufficientFunds as e:
             logger.error("insufficient Funds error: {}".format(repr(e)))
             minimal = self.get_minimal_quantity(symbol)
             balance = self.get_symbol_balance(symbol)
@@ -401,7 +401,7 @@ class MarketPlace:
 
         try:
             result = self.api.createLimitBuyOrder(symbol, quantity, price)
-        except ccxt.InsufficientFunds as e:
+        except  ....InsufficientFunds as e:
             logger.error("insufficient Funds error: {}".format(repr(e)))
             minimal = self.get_minimal_quantity(symbol)
             balance = self.get_symbol_balance(symbol)
@@ -437,7 +437,7 @@ class MarketPlace:
         return result
 
     def cancelOrder(self, Id, symbol):
-        order = self.ccxt_main('cancelOrder', Id, symbol)
+        order = self. ..._main('cancelOrder', Id, symbol)
 
         if not order or ('error' in order and len(order['error']) != 0):
             logger.error("Cannot cancel order of Id {} and symbol {}".format(Id, symbol))
@@ -447,9 +447,9 @@ class MarketPlace:
 
     def fetchOpenOrders(self, symbol=""):
         if symbol == "":
-            orders = self.ccxt_main('fetchOpenOrders')
+            orders = self. ..._main('fetchOpenOrders')
         else:
-            orders = self.ccxt_main('fetchOpenOrders', symbol)
+            orders = self. ..._main('fetchOpenOrders', symbol)
 
         if not orders:
             logger.error("Cannot gather open orders")
